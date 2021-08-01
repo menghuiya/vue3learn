@@ -1,21 +1,20 @@
 <template>
-  <div class="app-container">
-    <h2>app</h2>
-    <span class="text"> </span>
+  <div class="app">
+    <div class="app-container">
+      <FormDemo />
+      <br />
+      <m-input placeholder="请输入值sss"></m-input>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
+import FormDemo from './components/form/demo.vue';
 export default defineComponent({
   name: 'App',
-  components: {},
+  components: { FormDemo },
 });
 </script>
 
-<style lang="scss">
-.text {
-  color: $error-color;
-}
-</style>
+<style lang="scss"></style>

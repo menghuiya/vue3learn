@@ -1,5 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import './assets/styles/index.scss';
-
-createApp(App).mount('#app');
+import LibUses from './lib-uses';
+createApp(App)
+  .use(LibUses)
+  .mount('#app');
