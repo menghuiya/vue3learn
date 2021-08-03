@@ -3,7 +3,7 @@
     <div class="app-container">
       <FormDemo />
       <br />
-      <m-input placeholder="请输入值sss"></m-input>
+      <!-- <m-input placeholder="请输入值sss"></m-input> -->
     </div>
   </div>
 </template>
