@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div class="app-container">
-      <FormDemo />
+      <TreeDemo />
       <br />
       <!-- <m-input placeholder="请输入值sss"></m-input> -->
     </div>
@@ -10,10 +10,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import FormDemo from './components/form/demo.vue';
+import TreeDemo from './components/tree/demo.vue';
 export default defineComponent({
   name: 'App',
-  components: { FormDemo },
+  components: { TreeDemo },
 });
 </script>
 
