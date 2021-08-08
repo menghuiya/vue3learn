@@ -1,44 +1,10 @@
-import { defineComponent, PropType, watch, ref } from 'vue';
+import { defineComponent, PropType, watch, ref, useSlots } from 'vue';
 import { cloneDeep } from 'lodash';
 
-import { TreeNodeOptions, RequiredTreeNodeOption, nodeKey } from './types';
+import { TreeNodeOptions, RequiredTreeNodeOption, nodeKey, rednerFunc } from './types';
 import MNode from './node';
 import './index.scss';
-/**
- * 拉平tree结构的数据,平铺
- * @param source TreeNodeOptions[]
- * @returns RequiredTreeNodeOption[]
- */
-function flatTree(source: TreeNodeOptions[]): RequiredTreeNodeOption[] {
-  const result: RequiredTreeNodeOption[] = [];
-  const recursion = (list: TreeNodeOptions[], level = 0, parent: RequiredTreeNodeOption | null = null): RequiredTreeNodeOption[] => {
-    return list.map((item) => {
-      const node: RequiredTreeNodeOption = {
-        ...item,
-        level,
-        loadding: false,
-        disable: item.disable || false,
-        expanded: item.expanded || false,
-        selected: item.selected || false,
-        checked: item.checked || parent?.checked || false,
-        hasChildren: item.hasChildren || false,
-        parentKey: parent?.nodeKey || null,
-        children: item.children || [],
-      };
-
-      result.push(node);
-      if (item.expanded && node.children.length) {
-        node.children = recursion(node.children, level + 1, node);
-      }
-      return node;
-    });
-  };
-  if (source.length) {
-    recursion(source);
-  }
-
-  return result;
-}
+import { updateDownWards, updatePpWards } from './utils';
 
 export default defineComponent({
   name: 'MTree',
@@ -47,14 +13,62 @@ export default defineComponent({
       type: Array as PropType<TreeNodeOptions[]>,
       default: () => [],
     },
+    render: Function as PropType<rednerFunc>,
     lazyLoad: {
       type: Function as PropType<(node: RequiredTreeNodeOption, callback: (children: TreeNodeOptions[]) => void) => void>,
     },
+    showCheckbox: {
+      type: Boolean,
+      default: false,
+    },
+    checkStricty: {
+      type: Boolean,
+      default: false,
+    },
   },
-  setup(props, { emit }) {
+  emits: ['select-change', 'check-change'],
+  setup(props, { emit, slots, expose }) {
     //推导优先 其次泛型
     const loadding = ref(false);
     const selectKey = ref<nodeKey>('');
+    /**
+     * 拉平tree结构的数据,平铺
+     * @param source TreeNodeOptions[]
+     * @returns RequiredTreeNodeOption[]
+     */
+    const flatTree = (source: TreeNodeOptions[]): RequiredTreeNodeOption[] => {
+      const result: RequiredTreeNodeOption[] = [];
+      const recursion = (list: TreeNodeOptions[], level = 0, parent: RequiredTreeNodeOption | null = null): RequiredTreeNodeOption[] => {
+        return list.map((item) => {
+          const node: RequiredTreeNodeOption = {
+            ...item,
+            level,
+            loadding: false,
+            disable: item.disable || false,
+            expanded: item.expanded || false,
+            selected: item.selected || false,
+            checked: item.checked || parent?.checked || false,
+            hasChildren: item.hasChildren || false,
+            parentKey: parent?.nodeKey || null,
+            children: item.children || [],
+          };
+          if (node.selected) {
+            selectKey.value = node.nodeKey;
+          }
+
+          result.push(node);
+          if (item.expanded && node.children.length) {
+            node.children = recursion(node.children, level + 1, node);
+          }
+          return node;
+        });
+      };
+      if (source.length) {
+        recursion(source);
+      }
+
+      return result;
+    };
     const flatList = ref<RequiredTreeNodeOption[]>([]);
     watch(
       () => props.source,
@@ -130,11 +144,9 @@ export default defineComponent({
         } else {
           //懒加载
           if (props.lazyLoad && node.hasChildren) {
-            console.log('懒加载');
             node.loadding = true; //控制图标
             loadding.value = true; //防止重复点击
             props.lazyLoad(node, (children) => {
-              console.log('新的children', children);
               if (children.length) {
                 expandNode(node, children);
                 node.loadding = false; //控制图标
@@ -152,14 +164,56 @@ export default defineComponent({
     };
 
     const handleSelectChange = (node: RequiredTreeNodeOption) => {
-      console.log('handleSelectChange', node);
+      node.selected = !node.selected;
+      let newSelectKey: nodeKey = '';
+      if (selectKey.value !== node.nodeKey) {
+        const preSelectedIndex = flatList.value.findIndex((item) => item.nodeKey === selectKey.value);
+        if (preSelectedIndex > -1) {
+          flatList.value[preSelectedIndex].selected = false;
+        }
+        newSelectKey = node.nodeKey;
+      }
+      selectKey.value = newSelectKey;
+      emit('select-change', node);
     };
+
+    const handleCheckChange = ([checked, node]: [boolean, RequiredTreeNodeOption]) => {
+      node.checked = checked;
+      if (!props.checkStricty) {
+        //不严格勾选 父子联动
+        updateDownWards(checked, node);
+        updatePpWards(node, flatList.value);
+      }
+      emit('check-change', node);
+    };
+
+    expose({
+      getSelectedNode: (): RequiredTreeNodeOption | undefined => {
+        return flatList.value.find((item) => item.selected);
+      },
+      getCheckedNode: (): RequiredTreeNodeOption[] => {
+        return flatList.value.filter((item) => item.checked);
+      },
+    });
+
     return () => {
       return (
         <div class="ant-tree-wrap">
           <div class="ant-tree">
             {flatList.value.map((node, index) => {
-              return <MNode node={node} key={node.nodeKey} onToggleExpand={handleToggleExpand} onSelectChange={handleSelectChange} />;
+              return (
+                <MNode
+                  node={node}
+                  key={node.nodeKey}
+                  render={props.render}
+                  iconSlot={slots.icon}
+                  showCheckbox={props.showCheckbox}
+                  checkStricty={props.checkStricty}
+                  onToggleExpand={handleToggleExpand}
+                  onSelectChange={handleSelectChange}
+                  onCheckChange={handleCheckChange}
+                />
+              );
             })}
           </div>
         </div>

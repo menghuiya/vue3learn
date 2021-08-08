@@ -17,7 +17,14 @@ interface TreeNodeOptions {
   parentKey?: nodeKey | null;
 }
 
+interface TreeInstance {
+  getSelectedNode: () => RequiredTreeNodeOption | undefined;
+  getCheckedNode: () => RequiredTreeNodeOption[];
+}
+
 //组件内部使用 使用vue 自带方法 让他全部属性都有
 type RequiredTreeNodeOption = Required<TreeNodeOptions>;
 
-export { nodeKey, TreeNodeOptions, RequiredTreeNodeOption };
+type rednerFunc = (node: RequiredTreeNodeOption) => JSX.Element;
+
+export { nodeKey, TreeNodeOptions, RequiredTreeNodeOption, rednerFunc, TreeInstance };
