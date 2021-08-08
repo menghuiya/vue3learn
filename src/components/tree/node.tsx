@@ -29,7 +29,7 @@ export default defineComponent({
     onCheckChange: Function as CustomEventFuncType<[boolean, RequiredTreeNodeOption]>,
   },
   emits: ['toggle-expand', 'select-change', 'check-change'],
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const halfChecked = computed(() => {
       let result = false;
       if (!props.checkStricty && props.node.hasChildren) {
@@ -108,6 +108,11 @@ export default defineComponent({
         </div>
       );
     };
+
+    expose({
+      node: props.node,
+      halfChecked: () => halfChecked.value,
+    });
     return () => {
       return (
         <div class="ant-tree-node" style={{ paddingLeft: props.node.level * 18 + 'px' }} onClick={handleExpand}>

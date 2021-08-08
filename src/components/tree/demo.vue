@@ -1,8 +1,8 @@
 <template>
   <div class="demo-box">
     <h3>tree demo</h3>
-    <button @click="getSlectdNode">获取选中节点</button>
-    <button @click="getCheckedNode">获取勾选节点</button>
+    <button @click="getSlectdNode">获取选中节点</button> | <button @click="getCheckedNode">获取勾选节点</button> |
+    <button @click="getHalfCheckedNodes">获取半勾选节点</button>
     <m-tree ref="mTree" :source="list" :lazyLoad="lazyLoad" :showCheckbox="true">
       <template #icon="loadding">
         <i v-if="loadding" class="iconfont iconcustom-icon ico-loading"></i>
@@ -70,6 +70,10 @@ export default defineComponent({
       const node = mTree.value!.getCheckedNode();
       console.log(node);
     };
+    const getHalfCheckedNodes = () => {
+      const node = mTree.value!.getHalfCheckedNodes();
+      console.log('getHalfCheckedNodes', node);
+    };
     return {
       list,
       lazyLoad,
@@ -77,6 +81,7 @@ export default defineComponent({
       mTree,
       getSlectdNode,
       getCheckedNode,
+      getHalfCheckedNodes,
     };
   },
 });

@@ -1,7 +1,7 @@
-import { defineComponent, PropType, watch, ref, useSlots } from 'vue';
+import { defineComponent, PropType, watch, ref } from 'vue';
 import { cloneDeep } from 'lodash';
 
-import { TreeNodeOptions, RequiredTreeNodeOption, nodeKey, rednerFunc } from './types';
+import { TreeNodeOptions, RequiredTreeNodeOption, nodeKey, rednerFunc, TreeNodeInstance } from './types';
 import MNode from './node';
 import './index.scss';
 import { updateDownWards, updatePpWards } from './utils';
@@ -187,12 +187,21 @@ export default defineComponent({
       emit('check-change', node);
     };
 
+    const nodeRefs = ref<TreeNodeInstance[]>([]);
+    const setNodeRef = (index: number, node: TreeNodeInstance | null = null) => {
+      if (node) {
+        nodeRefs.value[index] = node;
+      }
+    };
     expose({
       getSelectedNode: (): RequiredTreeNodeOption | undefined => {
         return flatList.value.find((item) => item.selected);
       },
       getCheckedNode: (): RequiredTreeNodeOption[] => {
         return flatList.value.filter((item) => item.checked);
+      },
+      getHalfCheckedNodes: (): RequiredTreeNodeOption[] => {
+        return nodeRefs.value.filter((item) => item.halfChecked()).map((item) => item.node);
       },
     });
 
@@ -205,6 +214,9 @@ export default defineComponent({
                 <MNode
                   node={node}
                   key={node.nodeKey}
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  ref={setNodeRef.bind(null, index)}
                   render={props.render}
                   iconSlot={slots.icon}
                   showCheckbox={props.showCheckbox}

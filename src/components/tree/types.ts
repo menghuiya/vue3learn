@@ -20,6 +20,11 @@ interface TreeNodeOptions {
 interface TreeInstance {
   getSelectedNode: () => RequiredTreeNodeOption | undefined;
   getCheckedNode: () => RequiredTreeNodeOption[];
+  getHalfCheckedNodes: () => RequiredTreeNodeOption[];
+}
+interface TreeNodeInstance {
+  node: RequiredTreeNodeOption;
+  halfChecked: () => boolean;
 }
 
 //组件内部使用 使用vue 自带方法 让他全部属性都有
@@ -27,4 +32,4 @@ type RequiredTreeNodeOption = Required<TreeNodeOptions>;
 
 type rednerFunc = (node: RequiredTreeNodeOption) => JSX.Element;
 
-export { nodeKey, TreeNodeOptions, RequiredTreeNodeOption, rednerFunc, TreeInstance };
+export { nodeKey, TreeNodeOptions, RequiredTreeNodeOption, rednerFunc, TreeInstance, TreeNodeInstance };
