@@ -1,5 +1,5 @@
 import { defineComponent, PropType, watch, ref } from 'vue';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 
 import { TreeNodeOptions, RequiredTreeNodeOption, nodeKey, rednerFunc, TreeNodeInstance } from './types';
 import MNode from './node';
