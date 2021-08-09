@@ -2,17 +2,22 @@
   "name": "vue3mui",
   "version": "0.1.0",
   "private": true,
-  "main": "lib/vue3mui.common.js",
+  "main": "lib/umd/index.js",
+  "module": "lib/esm/index.js",
+  "typings": "lib/typings/index.js",
   "files": [
     "lib"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build:demo": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build:lib:cli": "vue-cli-service build --target lib --dest lib ./src/components/index.ts",
-    "build:esm": "rollup -c build/rollup.config.js",
-    "build:types": "tsc --project src/components/tsconfig.json"
+    "build:esm": "rollup --format esm -c build/rollup.config.js",
+    "build:umd": "rollup --format umd -c build/rollup.config.js",
+    "build:types": "tsc --project src/components/tsconfig.json",
+    "build:lib": "npm run build:esm && npm run build:umd",
+    "build": "npm run build:lib && npm run build:types"
   },
   "dependencies": {
     "async-validator": "^3.5.2",
