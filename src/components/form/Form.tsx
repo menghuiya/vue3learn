@@ -1,4 +1,3 @@
-import { useExpose } from '@/uses';
 import { ErrorList } from 'async-validator';
 import { defineComponent, getCurrentInstance, PropType, provide } from 'vue';
 import { AntFormRules, FormContext, FormItemContext, FormKey, validateFunc } from './types';
@@ -13,7 +12,7 @@ export default defineComponent({
     rules: Object as PropType<AntFormRules>,
   },
   emits: ['validate'],
-  setup(props, { emit, slots }) {
+  setup(props, { emit, slots, expose }) {
     const formItems: FormItemContext[] = [];
     const addItem = (item: FormItemContext) => {
       formItems.push(item);
@@ -53,7 +52,7 @@ export default defineComponent({
           return Promise.reject(errors);
         });
     };
-    useExpose<{ validate: validateFunc }>({
+    expose({
       validate,
     });
 

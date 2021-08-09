@@ -1,9 +1,7 @@
 <template>
   <div class="demo-box">
     <h3>tree demo</h3>
-    <button @click="getSlectdNode">获取选中节点</button> | <button @click="getCheckedNode">获取勾选节点</button> |
-    <button @click="getHalfCheckedNodes">获取半勾选节点</button>
-    <m-tree ref="mTree" :source="list" :lazyLoad="lazyLoad" :showCheckbox="true">
+    <m-tree :source="list" :lazyLoad="lazyLoad" :render="renderNode" :showCheckbox="true">
       <template #icon="loadding">
         <i v-if="loadding" class="iconfont iconcustom-icon ico-loading"></i>
         <i v-else class="iconfont iconzhankai"></i>
@@ -13,7 +11,7 @@
 </template>
 <script lang="tsx">
 import { defineComponent, onMounted, ref } from 'vue';
-import { TreeInstance, TreeNodeOptions } from './types';
+import { TreeNodeOptions } from '../types';
 
 function resursion(path = '0'): TreeNodeOptions[] {
   const list = [];
@@ -46,7 +44,7 @@ export default defineComponent({
           children: [],
           hasChildren: true,
           selected: false,
-          // disable: i % 2 === 0,
+          disable: i % 2 === 0,
         };
         result.push(treeNode);
       }
@@ -61,27 +59,10 @@ export default defineComponent({
         </div>
       );
     };
-    const mTree = ref<TreeInstance>();
-    const getSlectdNode = () => {
-      const node = mTree.value!.getSelectedNode();
-      console.log(node);
-    };
-    const getCheckedNode = () => {
-      const node = mTree.value!.getCheckedNode();
-      console.log(node);
-    };
-    const getHalfCheckedNodes = () => {
-      const node = mTree.value!.getHalfCheckedNodes();
-      console.log('getHalfCheckedNodes', node);
-    };
     return {
       list,
       lazyLoad,
       renderNode,
-      mTree,
-      getSlectdNode,
-      getCheckedNode,
-      getHalfCheckedNodes,
     };
   },
 });

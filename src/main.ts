@@ -1,7 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import { MTree } from './components';
 import './assets/styles/index.scss';
-import LibUses from './lib-uses';
+
 createApp(App)
-  .use(LibUses)
+  .use(MTree)
   .mount('#app');
